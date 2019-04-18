@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>To Do List</title>
+</h:head>
+<h:body>
+	<p:growl id="mensagem" />
+	<h:form id="lembretes">
+		<p:panel header="Lista de Lembretes">
+			<p:dataTable id="tabela" var="l" emptyMessage="Nenhum registro foi encontrado!"
+				paginator="true" value="#{lembreteBean.lembretes}" rows="3">
+				<f:facet name="footer">
+					<p:commandButton value="Novo"
+						oncomplete="PF('dialogNovoLembrete').show();"
+						actionListener="#{lembreteBean.novo()}"
+						update=":form_lembrete:panelGrid" />
+				</f:facet>
+				<p:column headerText="Nome" sortBy="#{l.nome}" filterBy="#{l.nome}">
+					<h:outputText value="#{l.nome}" />
+				</p:column>
+
+				<p:column headerText="Descrição" filterBy="#{l}">
+					<h:outputText value="#{l.descricao}" />
+				</p:column>
+
+				<p:column headerText="Data" filterBy="#{l.horario}">
+					<h:outputText value="#{l.horario}" />
+				</p:column>
+
+				<p:column headerText="Opções">
+					<p:commandButton icon="ui-icon-trash"
+						actionListener="#{lembreteBean.excluir}" update=":mensagem :lembretes:tabela">
+						<p:confirm header="Confirmação"
+							message="Tem certeza que deseja excluir?"
+							 icon="ui-icon-alert" />
+						<f:attribute name="selectLembrete" value="#{l}" />
+					</p:commandButton>
+					
+					<p:commandButton icon="ui-icon-pencil"
+						actionListener="#{lembreteBean.editar}" update=":lembretes:tabela :form_lembrete:panelGrid"
+						oncomplete="PF('dialogNovoLembrete').show();">
+						<f:attribute name="selectLembrete"	 value="#{l}" />
+					</p:commandButton>
+				</p:column>
+
+			</p:dataTable>
+
+			<p:confirmDialog global="true">
+				<p:commandButton styleClass="ui-confirmdialog-yes" type="button"
+					value="Sim" icon="ui-icon-check" />
+				<p:commandButton styleClass="ui-confirmdialog-no" type="button"
+					value="Não" icon="ui-icon-close" />
+			</p:confirmDialog>
+		</p:panel>
+	</h:form>
+
+	<p:dialog header="Novo Lembrete" widgetVar="dialogNovoLembrete"
+		draggable="false" resizable="false" modal="true">
+		<h:form id="form_lembrete">
+			<h:panelGrid columns="2" id="panelGrid">
+				<p:outputLabel value="Nome:" />
+				<p:inputText size="30" maxlength="150"
+					value="#{lembreteBean.lembrete.nome}" />
+
+				<p:outputLabel value="Descrição:" />
+				<p:inputTextarea size="30" maxlength="200"
+					value="#{lembreteBean.lembrete.descricao}" />
+
+				<p:outputLabel value="Data:" />
+				<p:calendar id="popup" value="#{lembreteBean.lembrete.horario}" />
+
+			</h:panelGrid>
+
+			<h:panelGrid columns="2">
+				<p:commandButton value="Salvar"
+					actionListener="#{lembreteBean.salvar}"
+					update=":mensagem :form_lembrete:panelGrid :lembretes:tabela" />
+				<p:commandButton value="Fechar"
+					oncomplete="PF('dialogNovoLembrete').hide();" />
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+</h:body>
+</html>
